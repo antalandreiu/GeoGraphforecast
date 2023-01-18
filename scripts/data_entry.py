@@ -1,14 +1,19 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
+import os
 
 # NOTA
 # I varii PATH ed i dizionari di encoding verranno definiti all'interno
 # di un file Json di configurazione all'interno della cartella config
 
-PATH = "../data/TU/datasets/toscana_e_prov_movimento_per_tipo_esercizio_annuale.csv"
+# PATH del file contenente i dati grezzi
+#PATH = "data/TU/datasets/toscana_e_prov_movimento_per_tipo_esercizio_annuale.csv"
+
+# Encoding
 TUSCANY_PROV = np.array([{"Pistoia": "PT"}, {"Firenze": "FI"}, {"Prato": "PO"},
-                         {"Livorno": "LI"}, {"Pisa": "PI"}, {"Arezzo": "AR"},{"Toscana": "TU"},
-                         {"Massa-Carrara": "MS"}, {"Lucca": "LU"},{"Siena": "SI"}, {"Grosseto": "GR"}], dtype=object)
+                         {"Livorno": "LI"}, {"Pisa": "PI"}, {"Arezzo": "AR"}, {"Toscana": "TU"},
+                         {"Massa-Carrara": "MS"}, {"Lucca": "LU"}, {"Siena": "SI"}, {"Grosseto": "GR"}], dtype=object)
 
 TUSCANY_EXERCISES = np.array([{"esercizi alberghieri": "HOT"},
                               {"alberghi di 5 stelle, 5 stelle lusso e 4 stelle ": "HOT5"},
@@ -17,10 +22,17 @@ TUSCANY_EXERCISES = np.array([{"esercizi alberghieri": "HOT"},
                               {"esercizi extra-alberghieri": "EXTRHOT"},
                               {"alloggi in affitto gestiti in forma imprenditoriale": "STD"},
                               {"agriturismi": "AGR"}, {"altri esercizi ricettivi": "OTHR"},
-                              {"totale esercizi ricettivi": "TOT"}, {'bed and breakfast' : "BB"},
+                              {"totale esercizi ricettivi": "TOT"}, {'bed and breakfast': "BB"},
                               {'campeggi e villaggi turistici': "CAMP"}], dtype=object)
 
-TURIST_RESIDENCE = np.array([{"Italia": "IT"}, {"Mondo": "WLD"}, {"Paesi esteri": "EXTR"}], dtype=object)
+TURIST_RESIDENCE = np.array([{"Italia": "IT"}, {"Mondo": "WRLD"}, {"Paesi esteri": "EXTR"}], dtype=object)
+
+# Creazione file structure
+OUT_DIRECTORY = Path("./data/TU/dataframes")
+OUT_NAME = "tuscany_turism.csv"
+
+
+
 
 
 def process_nan_rows(df: pd.DataFrame, column: str, target_col: str):
@@ -29,6 +41,7 @@ def process_nan_rows(df: pd.DataFrame, column: str, target_col: str):
 
     :param df Dataframe
     :param column containing categorical value
+    :param target_col column used to check for nan values
     :return Dataframe with nan values filled with 0"""
 
 
@@ -48,21 +61,27 @@ def process_nan_rows(df: pd.DataFrame, column: str, target_col: str):
             print(f"OK, {nan_ratio}% missing values in: ", val)
             pass
     print("\n\n")
-    tmp_df.fillna(0)
+    df.fillna(0, inplace=True)
 
 
-def _replace_values(df: pd.DataFrame, encoding_list: dict, label: str) -> pd.DataFrame:
+def _replace_values(df: pd.DataFrame, encoding_list: np.array, label: str) -> pd.DataFrame:
+    """Replace all value occurencies with another mapped value
+    :param df  dataframe to use
+    :param encoding_list list containing key-value pairs where the dict-key is the current cell value and the dict-value is the new one
+    :param label
+    :return df with replaced values"""
     for dictionary in encoding_list:
         for (key, value) in dictionary.items():
             df[label] = df[label].str.replace(key, value)
     return df
-def encode_tuscany_columns(Dataframe: pd.DataFrame) -> pd.DataFrame:
-    """ Encode All the categorical values of the 'Territory' & 'Type of exercise' Series
+
+
+def encode_columns(Dataframe: pd.DataFrame) -> pd.DataFrame:
+    """ Encode All the categorical values of the 'Territory', 'Type of exercise' & 'Country of residence' Series
     :param Dataframe
     :return encoded new Dataframe """
 
     tmp_df = Dataframe
-
     _replace_values(tmp_df, TUSCANY_PROV, "Territorio")
     _replace_values(tmp_df, TUSCANY_EXERCISES, "Tipologia di esercizio")
     _replace_values(tmp_df, TURIST_RESIDENCE, "Paese di residenza dei clienti")
@@ -71,18 +90,18 @@ def encode_tuscany_columns(Dataframe: pd.DataFrame) -> pd.DataFrame:
     return tmp_df
 
 def create_movement_df(PATH:str, region_code:str)-> pd.DataFrame:
-
     """ Creates new dataframe with the decided standard structure
     :param df base dataframe
     :return new dataframe"""
 
     tmp_df = pd.read_csv(PATH).sort_values(by=["Territorio", "Tipologia di esercizio","Paese di residenza dei clienti", "TIME","Indicatori"])
+    tmp_df = encode_columns(tmp_df)
     tmp_df.drop(labels=["ITTER107", "TIPO_DATO7", "CORREZ",
-                    "Correzione", "TIPO_ALLOGGIO2", "ATECO_2007",
-                    "Ateco 2007", "ISO", "Seleziona periodo",
-                    "Flag Codes", "Flags"], axis=1, inplace=True)
+                        "Correzione", "TIPO_ALLOGGIO2", "ATECO_2007",
+                        "Ateco 2007", "ISO", "Seleziona periodo",
+                        "Flag Codes", "Flags"], axis=1, inplace=True)
 
-    tmp_df = encode_tuscany_columns(tmp_df)
+
     process_nan_rows(tmp_df, "Tipologia di esercizio", "Value")
 
     arrivals = tmp_df.loc[tmp_df["Indicatori"] == "arrivi "]
@@ -96,11 +115,16 @@ def create_movement_df(PATH:str, region_code:str)-> pd.DataFrame:
     #assert [arrivals.drop(discard, axis=1).iloc[i].equals(presences.drop(discard, axis=1).iloc[i]) for i in range(row_numb)]
 
     cod_reg_tu = np.full_like(arrivals["Value"], region_code, dtype=object)
+    df = pd.DataFrame(data={"region": cod_reg_tu,
+                            "province": arrivals.Territorio.to_numpy(),
+                            "countryOfResidence": arrivals["Paese di residenza dei clienti"].to_numpy(),
+                            "typeOfExercise": arrivals["Tipologia di esercizio"].to_numpy(),
+                            "period": arrivals.TIME.to_numpy(),
+                            "arrivals": arrivals["Value"].to_numpy(),
+                            "presences": presences["Value"].to_numpy()}).sort_values(["region", "province", "countryOfResidence", "typeOfExercise","period", "arrivals", "presences"])
+    try:
+        df.to_csv(f"{OUT_DIRECTORY}/{OUT_NAME}", index=False)
+    except OSError:
+        OUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
+        df.to_csv(f"{OUT_DIRECTORY}/{OUT_NAME}", index=False)
 
-    return pd.DataFrame(data={"region": cod_reg_tu,
-                         "province": arrivals.Territorio.to_numpy(),
-                         "countryOfResidence": arrivals["Paese di residenza dei clienti"].to_numpy(),
-                         "typeOfExercise": arrivals["Tipologia di esercizio"].to_numpy(),
-                         "period": arrivals.TIME.to_numpy(),
-                         "arrivals": arrivals["Value"].to_numpy(),
-                         "presences": presences["Value"].to_numpy()}).sort_values(["region", "province", "countryOfResidence", "typeOfExercise","period", "arrivals", "presences"])

@@ -24,7 +24,7 @@ app.add_middleware(
 @app.get("/{region}/{province}/{type_of_exercise}/{tourist_residence}")
 def forecast(region: str, province: str, type_of_exercise: str, tourist_residence: str):
 
-    path = f"./../data/{region}/models/{province}/{type_of_exercise}/{tourist_residence}"
+    path = f"./data/{region}/models/{province}/{type_of_exercise}/{tourist_residence}"
     with open(f"{path}/presences_model.pkl", "rb") as model:
         forecaster = joblib.load(model)
         prediction = forecaster.forecast(PREDICTED_YEARS)
