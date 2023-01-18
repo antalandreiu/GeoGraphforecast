@@ -3,7 +3,6 @@ pandas
 sklearn
 uvicorn
 statsmodels
-pickle5
 fastapi
 fastapi[cors]
 pathlib
