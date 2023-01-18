@@ -33,7 +33,7 @@ def forecast(region: str, province: str, type_of_exercise: str, tourist_residenc
     indexes = list(prediction.index)
     assert len(values) == len(indexes)
 
-    data = [{"date": indexes[i],  "npeople": values[i]} for i in range(len(values))]
+    data = [{"date": indexes[i].strftime("%Y-%m"),  "npeople": values[i]} for i in range(len(values))]
 
     return str({"prediction": data})
 
