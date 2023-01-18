@@ -8,9 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 END_TRAIN = datetime(2021, 12, 1)
 PREDICTED_YEARS = 60
 
-
 app = FastAPI()
-
 
 # Handle CORS
 
@@ -37,7 +35,7 @@ def forecast(region: str, province: str, type_of_exercise: str, tourist_residenc
 
     data = [{"date": indexes[i],  "npeople": values[i]} for i in range(len(values))]
 
-    return {"prediction": data}
+    return str({"prediction": data})
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=os.getenv("PORT", default=5000), log_level="info")
