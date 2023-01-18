@@ -5,9 +5,9 @@ import numpy as np
 # I varii PATH ed i dizionari di encoding verranno definiti all'interno
 # di un file Json di configurazione all'interno della cartella config
 
-PATH = "../data/TUS/datasets/toscana_e_prov_movimento_per_tipo_esercizio_annuale.csv"
+PATH = "../data/TU/datasets/toscana_e_prov_movimento_per_tipo_esercizio_annuale.csv"
 TUSCANY_PROV = np.array([{"Pistoia": "PT"}, {"Firenze": "FI"}, {"Prato": "PO"},
-                         {"Livorno": "LI"}, {"Pisa": "PI"}, {"Arezzo": "AR"},{"Toscana": "TUS"},
+                         {"Livorno": "LI"}, {"Pisa": "PI"}, {"Arezzo": "AR"},{"Toscana": "TU"},
                          {"Massa-Carrara": "MS"}, {"Lucca": "LU"},{"Siena": "SI"}, {"Grosseto": "GR"}], dtype=object)
 
 TUSCANY_EXERCISES = np.array([{"esercizi alberghieri": "HOT"},

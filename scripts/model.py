@@ -41,7 +41,7 @@ def _create_models(path: str,df:pd.DataFrame, order:tuple, seasonal_order:tuple)
 
 
 def create_file_structure(regions:np.array, provinces:np.array, exercises:np.array, residences:np.array):
-    full_data = pd.read_csv("./../data/TUS/dataframes/tuscany_turism.csv")
+    full_data = pd.read_csv("../data/TU/dataframes/tuscany_turism.csv")
     for region_name in regions:
         reg_mask = full_data["region"] == region_name
         for province_name in provinces:
@@ -67,15 +67,18 @@ from dateutil.relativedelta import relativedelta
 END_TRAIN = datetime(2021, 12, 1)
 PREDICTED_YEARS = 60
 def forecast(region: str, province: str, type_of_exercise: str, tourist_residence: str):
+
     path = f"./../data/{region}/models/{province}/{type_of_exercise}/{tourist_residence}"
-    #df = pd.read_csv(f"{path}/df.csv")
     with open(f"{path}/arrivals_model.pkl", "rb") as model:
         forecaster = joblib.load(model)
         prediction = forecaster.forecast(PREDICTED_YEARS)
 
-    indexes = [END_TRAIN + relativedelta(months=x) for x in range(PREDICTED_YEARS)]
+    values = list(prediction.array)
+    indexes = list(prediction.index)
+    assert len(values) == len(indexes)
 
-    # df.to_dict(orient="records")
-    return{"path": path, "prediction": prediction, "indexes": indexes}
+    data = [{"date": indexes[i].strftime("%Y-%m"),  "npeople": values[i]} for i in range(len(values))]
 
-#forecast("TUS", "AR", "HOT", "IT")
+    return str({"prediction": data})
+
+print(forecast("TU", "AR", "HOT", "IT"))
