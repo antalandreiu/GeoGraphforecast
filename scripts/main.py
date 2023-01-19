@@ -1,9 +1,9 @@
 import os
-import joblib
 from fastapi import FastAPI
 from datetime import datetime
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
+import joblib
 
 END_TRAIN = datetime(2021, 12, 1)
 PREDICTED_YEARS = 60
