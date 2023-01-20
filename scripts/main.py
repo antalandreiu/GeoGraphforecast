@@ -4,6 +4,7 @@ from datetime import datetime
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 import joblib
+import api_tools
 
 END_TRAIN = datetime(2021, 12, 1)
 PREDICTED_YEARS = 60
@@ -21,6 +22,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
 @app.get("/{region}/{province}/{type_of_exercise}/{tourist_residence}")
 def forecast(region: str, province: str, type_of_exercise: str, tourist_residence: str):
 
@@ -33,7 +36,11 @@ def forecast(region: str, province: str, type_of_exercise: str, tourist_residenc
     indexes = list(prediction.index)
     assert len(values) == len(indexes)
 
-    data = [{"date": indexes[i].strftime("%Y-%m"),  "npeople": values[i]} for i in range(len(values))]
+    region_val = api_tools.get_key(region, api_tools.TUSCANY_PROV)
+    province_val = api_tools.get_key(province, api_tools.TUSCANY_PROV)
+    exercise_val = api_tools.get_key(type_of_exercise, api_tools.TUSCANY_EXERCISES)
+
+    data = [{"date": indexes[i].strftime("%Y-%m"),  "npeople": values[i], "region":region_val, "province": province_val, "typeOfExercise": exercise_val} for i in range(len(values))]
 
     return {"prediction": data}
 

@@ -11,21 +11,21 @@ import os
 #PATH = "data/TU/datasets/toscana_e_prov_movimento_per_tipo_esercizio_annuale.csv"
 
 # Encoding
-TUSCANY_PROV = np.array([{"Pistoia": "PT"}, {"Firenze": "FI"}, {"Prato": "PO"},
-                         {"Livorno": "LI"}, {"Pisa": "PI"}, {"Arezzo": "AR"}, {"Toscana": "TU"},
-                         {"Massa-Carrara": "MS"}, {"Lucca": "LU"}, {"Siena": "SI"}, {"Grosseto": "GR"}], dtype=object)
+TUSCANY_PROV_IT = np.array([{"Pistoia": "PT"}, {"Firenze": "FI"}, {"Prato": "PO"},
+                            {"Livorno": "LI"}, {"Pisa": "PI"}, {"Arezzo": "AR"}, {"Toscana": "TU"},
+                            {"Massa-Carrara": "MS"}, {"Lucca": "LU"}, {"Siena": "SI"}, {"Grosseto": "GR"}], dtype=object)
 
-TUSCANY_EXERCISES = np.array([{"esercizi alberghieri": "HOT"},
-                              {"alberghi di 5 stelle, 5 stelle lusso e 4 stelle ": "HOT5"},
-                              {"alberghi di 3 stelle e residenze turistico alberghiere": "HOT3"},
-                              {"alberghi di 2 stelle e alberghi di 1 stella": "HOT2"},
-                              {"esercizi extra-alberghieri": "EXTRHOT"},
-                              {"alloggi in affitto gestiti in forma imprenditoriale": "STD"},
-                              {"agriturismi": "AGR"}, {"altri esercizi ricettivi": "OTHR"},
-                              {"totale esercizi ricettivi": "TOT"}, {'bed and breakfast': "BB"},
-                              {'campeggi e villaggi turistici': "CAMP"}], dtype=object)
+TUSCANY_EXERCISES_IT = np.array([{"esercizi alberghieri": "HOT"},
+                                 {"alberghi di 5 stelle, 5 stelle lusso e 4 stelle ": "HOT5"},
+                                 {"alberghi di 3 stelle e residenze turistico alberghiere": "HOT3"},
+                                 {"alberghi di 2 stelle e alberghi di 1 stella": "HOT2"},
+                                 {"esercizi extra-alberghieri": "EXTRHOT"},
+                                 {"alloggi in affitto gestiti in forma imprenditoriale": "STD"},
+                                 {"agriturismi": "AGR"}, {"altri esercizi ricettivi": "OTHR"},
+                                 {"totale esercizi ricettivi": "TOT"}, {'bed and breakfast': "BB"},
+                                 {'campeggi e villaggi turistici': "CAMP"}], dtype=object)
 
-TURIST_RESIDENCE = np.array([{"Italia": "IT"}, {"Mondo": "WRLD"}, {"Paesi esteri": "EXTR"}], dtype=object)
+TURIST_RESIDENCE_IT = np.array([{"Italia": "IT"}, {"Mondo": "WRLD"}, {"Paesi esteri": "EXTR"}], dtype=object)
 
 # Creazione file structure
 OUT_DIRECTORY = Path("./data/TU/dataframes")
@@ -82,9 +82,9 @@ def encode_columns(Dataframe: pd.DataFrame) -> pd.DataFrame:
     :return encoded new Dataframe """
 
     tmp_df = Dataframe
-    _replace_values(tmp_df, TUSCANY_PROV, "Territorio")
-    _replace_values(tmp_df, TUSCANY_EXERCISES, "Tipologia di esercizio")
-    _replace_values(tmp_df, TURIST_RESIDENCE, "Paese di residenza dei clienti")
+    _replace_values(tmp_df, TUSCANY_PROV_IT, "Territorio")
+    _replace_values(tmp_df, TUSCANY_EXERCISES_IT, "Tipologia di esercizio")
+    _replace_values(tmp_df, TURIST_RESIDENCE_IT, "Paese di residenza dei clienti")
 
     #print(f"territorio: {tmp_df['Territorio'].unique()}\n\n ", f"esercizio: {tmp_df['Tipologia di esercizio'].unique()}\n\n", f"residenza: {tmp_df['Paese di residenza dei clienti'].unique()}\n\n")
     return tmp_df
