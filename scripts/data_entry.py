@@ -89,7 +89,7 @@ def encode_columns(Dataframe: pd.DataFrame) -> pd.DataFrame:
     #print(f"territorio: {tmp_df['Territorio'].unique()}\n\n ", f"esercizio: {tmp_df['Tipologia di esercizio'].unique()}\n\n", f"residenza: {tmp_df['Paese di residenza dei clienti'].unique()}\n\n")
     return tmp_df
 
-def create_movement_df(PATH:str, region_code:str)-> pd.DataFrame:
+def create_movement_df(PATH:str, region_code:str):
     """ Creates new dataframe with the decided standard structure
     :param df base dataframe
     :return new dataframe"""
