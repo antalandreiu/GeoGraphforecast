@@ -4,7 +4,7 @@ from datetime import datetime
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 import joblib
-import api_tools
+import scripts.api_tools as api_tools
 
 END_TRAIN = datetime(2021, 12, 1)
 PREDICTED_YEARS = 60
@@ -27,7 +27,7 @@ app.add_middleware(
 @app.get("/{region}/{province}/{type_of_exercise}/{tourist_residence}")
 def forecast(region: str, province: str, type_of_exercise: str, tourist_residence: str):
 
-    path = f"./data/{region}/models/{province}/{type_of_exercise}/{tourist_residence}"
+    path = f"./scripts/data/{region}/models/{province}/{type_of_exercise}/{tourist_residence}"
     with open(f"{path}/presences_model.pkl", "rb") as model:
         forecaster = joblib.load(model)
         prediction = forecaster.forecast(PREDICTED_YEARS)
