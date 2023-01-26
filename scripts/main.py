@@ -33,6 +33,7 @@ def forecast(region: str, province: str, type_of_exercise: str, tourist_residenc
         prediction = forecaster.forecast(PREDICTED_YEARS)
 
     values = list(prediction.array)
+    values = [0 if x < 0 else x for x in values]
     indexes = list(prediction.index)
     assert len(values) == len(indexes)
 
