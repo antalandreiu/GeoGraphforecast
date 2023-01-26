@@ -1,9 +1,0 @@
-numpy
-pandas
-sklearn
-uvicorn
-statsmodels
-fastapi
-fastapi[cors]
-pathlib
-joblib
